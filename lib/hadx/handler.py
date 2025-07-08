@@ -16,7 +16,7 @@ class Master:
         event: AWS Lambdaイベントオブジェクト
         context: AWS Lambdaコンテキストオブジェクト
     """
-    from hads.urls import Router
+    from hadx.urls import Router
     self.event = event
     self.context = context
     self.settings = importlib.import_module('project.settings') 

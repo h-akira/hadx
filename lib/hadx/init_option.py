@@ -12,7 +12,7 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, "templates")
 STATIC_URL = "/static"  # 先頭の/はあってもなくても同じ扱
 
 # ログイン周りの設定
-# from hads.authenticate import Cognito, ManagedAuthPage
+# from hadx.authenticate import Cognito, ManagedAuthPage
 # import boto3
 # if os.path.exists(os.path.join(BASE_DIR, "../admin.json")):
 #   import json
@@ -46,7 +46,7 @@ STATIC_URL = "/static"  # 先頭の/はあってもなくても同じ扱
 """
 
 URLS_PY_TEMPLATE = """\
-# from hads.urls import Path, Router
+# from hadx.urls import Path, Router
 # from .views import ...
 
 urlpatterns = [
@@ -58,7 +58,7 @@ urlpatterns = [
 LAMBDA_FUNCTION_PY_TEMPLATE = """\
 import sys
 import os
-from hads.handler import Master
+from hadx.handler import Master
 
 def lambda_handler(event, context):
   sys.path.append(os.path.dirname(__file__))
@@ -77,7 +77,7 @@ def lambda_handler(event, context):
       master.logger.warning("favicon.ico not found")
     else:
       master.logger.exception(e)
-    from hads.shortcuts import error_render
+    from hadx.shortcuts import error_render
     import traceback
     return error_render(master, traceback.format_exc())
 """

@@ -13,7 +13,7 @@ import importlib
 def parse_args():
   import argparse
   parser = argparse.ArgumentParser(description="""\
-This is a command line tool for managing hads project.
+This is a command line tool for managing hadx project.
 """, formatter_class = argparse.ArgumentDefaultsHelpFormatter)
   parser.add_argument("--version", action="version", version='%(prog)s 0.0.1')
   parser.add_argument("-p", "--profile", metavar="profile", help="aws profile, this takes precedence over admin file")
@@ -23,7 +23,7 @@ This is a command line tool for managing hads project.
   parser.add_argument("-d", "--deploy", action="store_true", help="exec sam deploy")
   parser.add_argument("-c", "--no-confirm-changeset", action="store_true", help="add --no-confirm-changeset when exec sam deploy")
   parser.add_argument("--delete", action="store_true", help="exec sam delete")
-  parser.add_argument("-i", "--init", action="store_true", help="create hads project")
+  parser.add_argument("-i", "--init", action="store_true", help="create hadx project")
   parser.add_argument("-g", "--test-get", metavar="path", help="test get method")
   parser.add_argument("-e", "--test-get-event", metavar="path", help="test get method by event file")
   parser.add_argument("--sam", nargs="*", metavar="arg", help="exec sam command")
@@ -47,7 +47,7 @@ This is a command line tool for managing hads project.
 def main():
   options = parse_args()
   if options.init:
-    from hads.init_option import gen_templates
+    from hadx.init_option import gen_templates
     gen_templates()
     sys.exit()
   if options.file is None:
@@ -91,14 +91,14 @@ def main():
       if options.local_server_run == "sam":
         subprocess.run(["sam", "local", "start-api", "--port", str(admin["local_server"]["port"]["sam"]), "--profile", profile, "--region", region], env=env, cwd=CWD)
       elif options.local_server_run == "static":
-        from hads.local_server import run_static_server 
+        from hadx.local_server import run_static_server 
         run_static_server(
           settings.STATIC_URL, 
           os.path.join(CWD, admin["static"]["local"]),
           admin["local_server"]["port"]["static"]
         )
       elif options.local_server_run == "proxy":
-        from hads.local_server import run_proxy_server 
+        from hadx.local_server import run_proxy_server 
         run_proxy_server(
           settings.STATIC_URL,
           admin["local_server"]["port"]["proxy"],
