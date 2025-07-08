@@ -77,7 +77,7 @@ def lambda_handler(event, context):
       master.logger.warning("favicon.ico not found")
     else:
       master.logger.exception(e)
-    from hads.shourtcuts import error_render
+    from hads.shortcuts import error_render
     import traceback
     return error_render(master, traceback.format_exc())
 """
