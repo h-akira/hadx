@@ -147,13 +147,14 @@ class Cognito:
     ).digest()
     
     return base64.b64encode(dig).decode()
-  def set_auth_by_code(self, master):
+  def set_auth_by_code(self, master, code=None):
     if master.request.auth:
       return True
-    try:
-      code = master.event['queryStringParameters']['code']
-    except:
-      return False
+    if code is None:
+      try:
+        code = master.event['queryStringParameters']['code']
+      except:
+        return False
     response = self._authCode2token(code, master.settings.AUTH_PAGE.get_redirect_uri(master))
     if "id_token" not in response.keys() or "access_token" not in response.keys() or "refresh_token" not in response.keys():
       master.logger.warning("code is not found, probably expired")

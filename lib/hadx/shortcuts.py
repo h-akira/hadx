@@ -53,11 +53,7 @@ def gen_response(master, body, content_type="text/html; charset=UTF-8", code=200
   response = {
     "statusCode": code,
     "headers": {
-      "Content-Type": content_type,
-      "Access-Control-Allow-Origin": "http://localhost:8080",
-      "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type,Authorization",
-      "Access-Control-Allow-Credentials": "true"
+      "Content-Type": content_type
     },
     "body": body
   }
