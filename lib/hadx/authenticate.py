@@ -47,6 +47,9 @@ class Cognito:
       "Authorization": f"Basic {auth_header}"
     }
     
+    self.logger.info(f"code: {code}")
+    self.logger.info(f"redirect_uri: {redirect_uri}")
+    
     data = {
       'grant_type': 'authorization_code',
       'client_id': self.client_id,
