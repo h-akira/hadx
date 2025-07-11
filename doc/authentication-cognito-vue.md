@@ -20,6 +20,13 @@
 - **Cookie based認証** (hadxライブラリで自動管理)
 - **Vue 3 Composition API** + **Vue Router**
 
+### 重要な注意事項
+⚠️ **リダイレクトURIの末尾スラッシュ問題**
+- Cognitoのリダイレクト先URLでは末尾スラッシュ（`/`）があるとエラーが発生する場合があります
+- 正しい形式：`https://your-domain.com`
+- 間違った形式：`https://your-domain.com/`
+- すべての設定（settings.py、config.js、CognitoConsole）で統一する必要があります
+
 ### アーキテクチャ
 ```
 [ユーザー] → [Cognito Login] → [Vue.js SPA] → [CloudFront] → [API Gateway] → [AWS Lambda + hadx] → [Cognito API]
@@ -28,7 +35,7 @@
 ### 認証フロー概要
 1. 未ログインユーザーがログインボタンをクリック
 2. Cognitoマネージドログインページにリダイレクト
-3. ログイン完了後、`https://domain.com/?code=xxxxx` にリダイレクト
+3. ログイン完了後、`https://domain.com?code=xxxxx` にリダイレクト
 4. Vue.jsが認証コードを検出し、自動でバックエンドAPIに送信
 5. バックエンドがCognito APIでトークン取得・Cookie設定
 6. フロントエンドで認証状態更新・URLクリーンアップ
@@ -80,8 +87,8 @@ COGNITO = Cognito(
 # 認証ページ設定（重要：ホームページをリダイレクト先に設定）
 AUTH_PAGE = ManagedAuthPage(
     scope="aws.cognito.signin.user.admin email openid phone",
-    login_redirect_uri="https://your-domain.com/",  # ホームページ（/auth/callbackではない）
-    local_login_redirect_uri="http://localhost:8080/"
+    login_redirect_uri="https://your-domain.com",  # ホームページ（末尾スラッシュなし）
+    local_login_redirect_uri="http://localhost:8080"  # 末尾スラッシュなし
 )
 ```
 
@@ -230,8 +237,8 @@ export const config = {
   // Cognito設定
   cognito: {
     // CognitoマネージドログインページのURL
-    loginURL: 'https://your-cognito-domain.auth.region.amazoncognito.com/login?client_id=your-client-id&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fyour-domain.com%2F'
-    // 注意: redirect_uriはホームページ（/）を指定。/auth/callbackではない
+    loginURL: 'https://your-cognito-domain.auth.region.amazoncognito.com/login?client_id=your-client-id&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Fyour-domain.com'
+    // 注意: redirect_uriはホームページを指定（末尾スラッシュなし）。/auth/callbackではない
   }
 }
 ```
@@ -599,7 +606,7 @@ createApp(App).use(router).mount('#app')
 5. ユーザーが認証情報を入力
    ↓
 6. Cognitoが認証コードと共にホームページにリダイレクト
-   https://your-domain.com/?code=xxxxx
+   https://your-domain.com?code=xxxxx
    ↓
 7. Home.vueのonMountedで認証コードを検出
    ↓
@@ -683,10 +690,11 @@ Lambda/
 ### よくある問題と解決方法
 
 #### 1. 400 Bad Request (トークン交換エラー)
-**原因**: redirect_uriの不一致
+**原因**: redirect_uriの不一致または末尾スラッシュ問題
 **解決**: 
 - Cognitoの設定でCallback URLsが正しく設定されているか確認
 - バックエンドのAUTH_PAGE.login_redirect_uriがCognitoの設定と一致しているか確認
+- **重要**: すべてのリダイレクトURIで末尾スラッシュを削除（例：`https://domain.com`）
 
 #### 2. AccessDenied (ログアウト後)
 **原因**: ログアウト後に認証が必要なページでリロードされる
@@ -717,6 +725,14 @@ const authCode = urlParams.get('code')
   }
 }
 ```
+
+#### 6. redirect_uriエラー（末尾スラッシュ問題）
+**原因**: Cognitoリダイレクト先URLの末尾スラッシュが原因
+**解決**: 
+- すべてのリダイレクトURIで末尾スラッシュを削除
+- 正しい形式：`https://your-domain.com`
+- 間違った形式：`https://your-domain.com/`
+- `settings.py`と`config.js`の両方で統一
 
 ### デバッグ用ログ
 
@@ -762,7 +778,7 @@ VUE_APP_API_BASE_URL=https://your-cloudfront-domain.com
 - Custom Error Pages: 404→200 /index.html (History API対応)
 
 4. **Cognito設定**:
-- Callback URLs: `https://your-domain.com/`
+- Callback URLs: `https://your-domain.com` (末尾スラッシュなし)
 - Sign out URLs: `https://your-domain.com`
 
 ### セキュリティ考慮事項
